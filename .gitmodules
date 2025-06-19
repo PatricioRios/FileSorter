@@ -1,9 +1,9 @@
 [submodule "custom-nodes"]
 	path = custom-nodes
 	url = git@github.com:PatricioRios/custom-nodes.git
-[submodule "file-and-notify-manager-mcp"]
-	path = file-and-notify-manager-mcp
-	url = git@github.com:PatricioRios/file-and-notify-manager-mcp.git
 [submodule "directory-watcher"]
 	path = directory-watcher
 	url = git@github.com:PatricioRios/directory-watcher.git
+[submodule "file-and-notify-manager-mcp"]
+	path = file-and-notify-manager-mcp
+	url = git@github.com:PatricioRios/file-and-notify-manager-mcp.git
