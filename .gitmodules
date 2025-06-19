@@ -1,6 +1,6 @@
 [submodule "custom-nodes"]
 	path = custom-nodes
-	url = ./custom-nodes
+	url = git@github.com:PatricioRios/custom-nodes.git
 [submodule "file-and-notify-manager-mcp"]
 	path = file-and-notify-manager-mcp
 	url = ./file-and-notify-manager-mcp
