@@ -1,0 +1,37 @@
+{
+    "folders": [
+        {
+            "path": "/home/pato/Universidad/4to año/Ing de Software",
+            "description": "En esta carpeta van los archivos correspondientes a la materia ingieneria de software.",
+            "extensibe": false
+        },
+        {
+            "path": "/home/pato/Universidad/4to año/Paradigma y lenguajes 3",
+            "description": "En esta carpeta van los archivos correspondientes a la Paradigmas y lenguajes 3.",
+            "extensibe": false
+        },
+        {
+            "path": "/home/pato/Universidad/4to año/Redes y datos 2",
+            "description": "En esta carpeta van los archivos correspondientes a la materia Redes y Datos 2.",
+            "extensibe": false
+        },
+        {
+            "path": "/home/pato/Universidad/4to año/Seminario de actualizacion 1",
+            "description": "En esta carpeta van los archivos correspondientes a la materia Seminario de actualizacion 1.",
+            "extensibe": false
+        },
+        {
+            "path": "/home/pato/Descargas/Instalables",
+            "description": "En esta carpeta van los archivos correspondientes a todo tipo de archivo que sirva para instalar un programa en la computadora, mi computadora es de debian 12, asi que los archivos prodrian terminar en *.deb, *.appimage, *.flatpak, *.tar.gz, *.tar.bz2, *.tar.xz, *.tar.lzma, *.tar.zst, *.tar.lzo, *.tar.lzop, *.tar.lz4, *.tar.lzip, *.tar.lz4c, *.tar.lzop2, *.tar.lzop3, *.tar.lzop4, *.tar.lzop5, *.tar.lzop6, *.tar.lzop7, *.tar.lzop8, *.tar.lzop9",
+            "extensibe": true
+        },
+        {
+            "path":"/home/pato/Universidad/3er año/Administracion de proyectos de sistemas",
+            "description":"En esta carpeta van los archivos correspondientes a la materia Administracion de sistemas de informacion.",
+            "extensibe":false
+        }
+    ],
+    "default_folder": "/home/pato/Basurero",
+    "user_file_content": true,
+    "folder_for_errors": "/home/pato/.config/file-sorter/errors"
+}

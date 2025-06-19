@@ -1,0 +1,9 @@
+[submodule "custom-nodes"]
+	path = custom-nodes
+	url = ./custom-nodes
+[submodule "file-and-notify-manager-mcp"]
+	path = file-and-notify-manager-mcp
+	url = ./file-and-notify-manager-mcp
+[submodule "directory-watcher"]
+	path = directory-watcher
+	url = ./directory-watcher

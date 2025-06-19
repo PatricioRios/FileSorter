@@ -1,0 +1,631 @@
+{
+  "name": "file-sorter-workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-friendgrid.dataFolderChangue",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        -120
+      ],
+      "id": "ef3cc9f7-da48-4015-8c6d-ecd81eaf24d8",
+      "name": "Data Folder Changue"
+    },
+    {
+      "parameters": {
+        "operation": "executeTool",
+        "toolName": "={{ $fromAI(\"tool\",\"the tool selected\") }}",
+        "toolParameters": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Tool_Parameters', ``, 'json') }}"
+      },
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        0
+      ],
+      "id": "3f3e9139-b826-459c-9cfc-6fec24eff043",
+      "name": "exec",
+      "credentials": {
+        "mcpClientApi": {
+          "id": "heLrm8n9TpwPvQiG",
+          "name": "file-and-notify-manager"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        980,
+        0
+      ],
+      "id": "2249906a-4acf-4e9a-9326-67ab776b8d3f",
+      "name": "list",
+      "credentials": {
+        "mcpClientApi": {
+          "id": "heLrm8n9TpwPvQiG",
+          "name": "file-and-notify-manager"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"is_error\": \"false\",\n  \"title\":\"Archivo movido\",\n  \"message\":\"no hubieron errores\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1260,
+        -20
+      ],
+      "id": "23b842c9-bcd8-4523-b5cc-91131be08536",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "TITLE": "={{ $json.output.title}}",
+        "MESSAGE": "={{ $json.output.message }}",
+        "URGENCY": "critical",
+        "USE_ICON": true,
+        "ICON": "/home/pato/.config/file-sorter/icons/warning.png"
+      },
+      "type": "n8n-nodes-friendgrid.notifySender",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        -360
+      ],
+      "id": "c5b4316c-c942-4c9d-8970-8756009a2393",
+      "name": "notificacion critica"
+    },
+    {
+      "parameters": {
+        "TITLE": "={{ $json.output.title}}",
+        "MESSAGE": "={{ $json.output.message }}",
+        "USE_ICON": true,
+        "ICON": "/home/pato/.config/file-sorter/icons/ok.png"
+      },
+      "type": "n8n-nodes-friendgrid.notifySender",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        -160
+      ],
+      "id": "c8e1d95a-cbee-4454-80cd-8e7dff08c4f1",
+      "name": "notificacion normal"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b1829060-32e1-4edc-81fc-72dd1c1b8b39",
+              "name": "prompt",
+              "value": "=Tengo el siguiente archivo: \n\" \n{{ $('Data Folder Changue').item.json.path }} \n\" \nCon el siguiente contenido: \n\" \n{{ $json.text }} \n\" \nQuiero que basándonos en el nombre del archivo, y su contenido utilices la tool llamada \"mv\", la cual tiene 3 parámetros, los cuales son  \nfile_origin: El path del archivo que se quiere mover. ej:  /home/user/Downloads/file.txt (esta es la ubicación inicial) \nfile_dest: El path hacia donde se va a mover el archivo si el usuario confirma. Por ejemplo: /home/user/PathDestino (esta es la ubicación a donde se moverá el archivo)\nfile_default_dest: Este es un tercer path en donde usuario puede elegir mandarlo, generalmente es un lugar en donde sirve para acumular los archivos de manera temporal. /home/user/PathDestino (esta es la ubicación a donde se moverá el archivo) \nEn este caso file_origin será \"{{ $('Data Folder Changue').item.json.path }}\". \nfile_default_dest será \"{{ $('Tipo de archivo').item.json.data.default_folder }}\". \nY file dest vas a tener que decidirlo vos, los posibles destinos son: \n\"\n{{ JSON.stringify($('Extraer informacion').item.json.data.folders, null, 2) }} \n\" \npath es el path destino. \ndescription es una descripción del contenido que debería ir adentro de la carpeta. Y extensible solo indica si la descripción fue una descripción \"buena\". \nNo quiero que realices ninguna acción que no sea mover, no quiero que le cambies el nombre ni nada, solo utiliza la tool de \"mv\".\nQuiero que al final me digas si es que hubo algún error o no, con un mensaje y título, por ejemplo:\n{\n\"is_error\":\"false\",\n\"title\":\"título de la notificación\"\n\"message\":\"hola, salió todo bien\"\n}, o si hubo un error\n{\n\"is_error\":\"true\",\n\"title\":\"título de la notificación\",\n\"message\":\"hubo errores...\"\n},\nQuiero que sean mensajes cortos.\nEl título tiene que ser corto 2 o 3 palabras cuando mucho.\n¡Eso es todo lo que debes saber, suerte en tu tarea!\n\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        700,
+        -460
+      ],
+      "id": "9af3374f-385b-4ad1-9ed5-225b69b8dea2",
+      "name": "Create Prompt"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-preview-04-17",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        860,
+        -60
+      ],
+      "id": "5dfd538f-cd4d-430d-a779-6169128e8046",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "KiIRcaKPbiu6TlBO",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        440,
+        -560
+      ],
+      "id": "02c38053-dad5-4f9a-bdbb-f4620a3519ff",
+      "name": "Extractraer contenido"
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $('Data Folder Changue').item.json.path }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        260,
+        -560
+      ],
+      "id": "26342246-ad9c-42bd-9629-12b0b30ceaad",
+      "name": "leer archivo"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        440,
+        -340
+      ],
+      "id": "a07f91ae-27cf-4bc5-ab12-ab258ab298aa",
+      "name": "Extract from File2"
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $json.path }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        260,
+        -340
+      ],
+      "id": "f5ff36d9-b4c5-419c-b8ec-a502f2da341e",
+      "name": "Read/Write Files from Disk2"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/home/pato/.config/file-sorter/config.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -440,
+        -120
+      ],
+      "id": "8b899db0-3c17-46d4-a06a-9342515c9295",
+      "name": "Leer archivo de configuracion"
+    },
+    {
+      "parameters": {
+        "operation": "fromJson",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        -120
+      ],
+      "id": "5c10daa4-bbfb-4b9a-a534-f7db9cff8629",
+      "name": "Extraer informacion"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f7d5469a-194d-4e25-8c17-2440136c59e7",
+              "leftValue": "={{ $json.data.user_file_content }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -120,
+        -120
+      ],
+      "id": "9f41ec10-1059-4cfb-8085-1ed39ed18053",
+      "name": "utilizar contenido?"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Data Folder Changue').item.json.path }}",
+                    "rightValue": ".pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "endsWith"
+                    },
+                    "id": "012a4ff3-cea9-41aa-b164-463f6abef302"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f48a64c1-bed8-4e7b-9837-1d33ab601d2d",
+                    "leftValue": "={{ $('Data Folder Changue').item.json.path }}",
+                    "rightValue": ".csv",
+                    "operator": {
+                      "type": "string",
+                      "operation": "endsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "74e31170-3972-4fa2-bf8c-e2a291ccbedb",
+                    "leftValue": "={{ $('Data Folder Changue').item.json.path }}",
+                    "rightValue": "={{ $('Data Folder Changue').item.json.path }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        60,
+        -240
+      ],
+      "id": "90f15e5b-411b-4325-9298-f571a6e452fe",
+      "name": "Tipo de archivo"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "462ff8ce-b137-4744-9bb5-03b79b7a86c2",
+              "name": "prompt",
+              "value": "=Tengo el siguiente archivo: \n\"\n{{ $('Data Folder Changue').item.json.path }} \n\" \nQuiero que basándonos en el nombre del archivo, utilices la tool llamada \"mv\", la cual tiene 3 parámetros, los cuales son\nfile_origin: El path del archivo que se quiere mover. ej:  /home/user/Downloads/file.txt (esta es la ubicación inicial)\nfile_dest: El path hacia donde se va a mover el archivo si el usuario confirma. /home/user/PatDestino (esta es la ubicación a donde se moverá el archivo) \nfile_default_dest: Este es un tercer path en donde usuario puede elegir mandarlo, generalmente es un lugar en donde sirve para acumular los archivos de manera temporal. \n/home/user/PathDestino (esta es la ubicación a donde se moverá el archivo) \nEn este caso file_origin sera \"{{ $('Data Folder Changue').item.json.path }}\". \nfile_default_dest sera \"{{ $json.data.default_folder }}\". \nY file dest vas a tener que decidirlo vos, los posibles destinos son: \n\"\n{{ JSON.stringify($('Extraer informacion').item.json.data.folders, null, 2) }} \n\" \npath es el path destino. description es una descripción del contenido que debería ir adentro de la carpeta. Y extensible solo indica si la descripción (description) fue una descripción \"buena\". \nNo quiero que realices ninguna acción que no sea mover, no quiero que le cambies el nombre ni nada, solo utiliza la tool de \"mv\".\nQuiero que al final me digas si es que hubo algún error o no ejemplo, con un mensaje:\n{\n\"is_error\":\"false\",\n\"title\":\"título de la notificación\"\n\"message\":\"hola, salió todo bien\"\n}, o si hubo un error\n{\n\"is_error\":\"true\",\n\"title\":\"título de la notificación\",\n\"message\":\"hubo errores...\"\n},\nquiero que sean mensajes cortos.\nEl título tiene que ser corto 2 o 3 palabras cuando mucho.\n¡Eso es todo lo que debes saber, suerte en tu tarea!.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        700,
+        -100
+      ],
+      "id": "c339524f-b065-483d-96ee-05ad9e7d0cd0",
+      "name": "Create Promt"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        920,
+        -260
+      ],
+      "id": "c4021417-f7ab-420a-8ef4-fb35ea8a627b",
+      "name": "Realizar tarea"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "82ce06db-c418-47e5-9e24-41249c1a0347",
+              "leftValue": "={{ $json.output.is_error }}",
+              "rightValue": "\"true\"",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1260,
+        -260
+      ],
+      "id": "92843bac-ecd7-4854-a405-7a4145c9d489",
+      "name": "Hubo errores?"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Data Folder Changue": {
+      "main": [
+        [
+          {
+            "node": "Leer archivo de configuracion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "exec": {
+      "ai_tool": [
+        [
+          {
+            "node": "Realizar tarea",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "list": {
+      "ai_tool": [
+        [
+          {
+            "node": "Realizar tarea",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Realizar tarea",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Prompt": {
+      "main": [
+        [
+          {
+            "node": "Realizar tarea",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Realizar tarea",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extractraer contenido": {
+      "main": [
+        [
+          {
+            "node": "Create Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "leer archivo": {
+      "main": [
+        [
+          {
+            "node": "Extractraer contenido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk2": {
+      "main": [
+        [
+          {
+            "node": "Extract from File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer archivo de configuracion": {
+      "main": [
+        [
+          {
+            "node": "Extraer informacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer informacion": {
+      "main": [
+        [
+          {
+            "node": "utilizar contenido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "utilizar contenido?": {
+      "main": [
+        [
+          {
+            "node": "Tipo de archivo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Promt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tipo de archivo": {
+      "main": [
+        [
+          {
+            "node": "leer archivo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Read/Write Files from Disk2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Create Promt": {
+      "main": [
+        [
+          {
+            "node": "Realizar tarea",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Realizar tarea": {
+      "main": [
+        [
+          {
+            "node": "Hubo errores?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hubo errores?": {
+      "main": [
+        [
+          {
+            "node": "notificacion critica",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "notificacion normal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "YWIzafsIOYcROYju"
+  },
+  "versionId": "a2ed0f0f-23d5-46be-95cf-4636a0a73f97",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1fbb19fcbbd64cb3bc37daf83255020e6f25c3f7f4a2fc8badb22c09805d1ca3"
+  },
+  "id": "qBdP2HHvWmhq81qw",
+  "tags": []
+}
